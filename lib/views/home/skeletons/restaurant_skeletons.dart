@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:food_panda6/res/app_url.dart';
-import 'package:food_panda6/views/business_owner/add_restaurant.dart';
-import 'package:food_panda6/views/home/models/restaurant.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class ResturantCard extends StatelessWidget {
- ResturantCard({
-    this.restaurant
+class RestaurantSkeleton extends StatelessWidget {
+  const RestaurantSkeleton({
+    super.key,
   });
 
-  Datum? restaurant;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => AddRestaurant()));
-      },
+    return Skeletonizer(
+      enabled: true,
       child: Container(
-        margin: EdgeInsets.only(top:16,left: 16),
-        width: MediaQuery.of(context).size.width * 0.75, // get width 75% of screen
+        margin: EdgeInsets.only(top: 16, left: 16),
+        width: MediaQuery.of(context).size.width * .75,
+        // get width 75% of screen
         height: 350,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,24 +22,23 @@ class ResturantCard extends StatelessWidget {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                      '${AppUrl.baseUrl}${restaurant!.attributes!.picture!.data!.attributes!.url}',
-                    fit: BoxFit.fill,
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    height: 250,
-                )),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      color: Colors.white,
+                      width: MediaQuery.of(context).size.width * .75,
+                      height: 220,
+                    )),
                 Positioned(
                   top: 15,
                   child: Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          color: Colors.pink,
+                          //
                           borderRadius: BorderRadius.only(
                               topRight: Radius.circular(10),
                               bottomRight: Radius.circular(10))),
                       child: Text(
-                        '${restaurant!.attributes!.discount}% OFF',
+                        '15% OFF',
                         style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -56,14 +51,15 @@ class ResturantCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  restaurant!.attributes!.name.toString() ?? "default value",
+                  'TUBE COFFEE',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '\$\$\$. ${restaurant!.attributes!.category}',
+                  '\$. Text & Coffee',
                   style: TextStyle(fontSize: 15),
                 ),
-                Text('${restaurant!.attributes!.deliveryTime} mn  ${restaurant!.attributes!.deliveryFee} \$', style: TextStyle(fontSize: 15))
+                Text('5-20 mn   \$ delivery fee',
+                    style: TextStyle(fontSize: 15))
               ],
             ),
           ],

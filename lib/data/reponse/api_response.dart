@@ -8,7 +8,7 @@ class ApiResponse<T>{
   String? message;
 
   // Mark : Constructor for general response
-  ApiResponse(this.status,this.data,this.message);
+  ApiResponse({this.status,this.data,this.message});
   // Mark : Constructor for loading state
   ApiResponse.loading(): status = Status.LOADING;
   // Mark : Constructor for complete state

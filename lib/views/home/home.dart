@@ -1,25 +1,45 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:food_panda6/data/reponse/status.dart';
+import 'package:food_panda6/views/business_owner/add_restaurant.dart';
+import 'package:food_panda6/views/home/repository/restaurant_repo.dart';
+import 'package:food_panda6/views/home/skeletons/restaurant_skeletons.dart';
+import 'package:food_panda6/views/home/viewmodels/restaurant_vm.dart';
+import 'package:provider/provider.dart';
 import 'widgets/drawer.dart';
 import 'widgets/resturant_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   /// Main container decoration
   final boxDecoration = BoxDecoration(
       color: Colors.white, borderRadius: BorderRadius.circular(10));
 
-  /// Container Margin
+  var _restaurantViewModel = RestaurantViewModel();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _restaurantViewModel.getAllRestaurant();
+  }
+
+  /// Mark : Container Margin
   final mainContainerMargin =
-      EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20); // margin
+      EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20);
 
-  /// Sub-Container padding
+  /// Mark : Sub-Container padding
   final childPadding =
-      const EdgeInsets.only(top: 15, left: 15, right: 5, bottom: 5);
+      const EdgeInsets.only(top:10,bottom: 0,left: 15,right: 0);
 
-  /// Sub-Title
+  /// Mark : Sub-Title
   final subTitle = TextStyle(fontSize: 22, fontWeight: FontWeight.bold);
 
   @override
@@ -38,14 +58,20 @@ class HomeScreen extends StatelessWidget {
         // leadingWidth: 35,
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.favorite)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.shopping_basket))
+          IconButton(onPressed: () {}, icon: Icon(Icons.shopping_basket)),
+          IconButton(onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddRestaurant()),
+            );
+          }, icon: Icon(Icons.add_box))
         ],
       ),
       drawer: MyDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            /// Food Delivery Section
+            /// Mark : Section Food Delivery
             Container(
               color: Colors.grey.shade200,
               child: Column(
@@ -63,13 +89,13 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Text('Food delivery',
                               style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.bold)),
+                                  fontSize: 25, fontWeight: FontWeight.w900)),
                           Text('Order food you love',
-                              style: TextStyle(fontSize: 15)),
+                              style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400)),
                           Align(
                             alignment: Alignment.bottomRight,
                             child: Image.asset(
-                              'assets/images/soup.jpg',
+                              'assets/images/foodpanda.png',
                               fit: BoxFit.contain,
                               width: 150,
                               height: 100,
@@ -80,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  /// 2nd Section
+                  /// Mark : 2nd Section
                   Container(
                     margin: EdgeInsets.only(
                         top: 0, left: 20, right: 20, bottom: 20),
@@ -161,7 +187,7 @@ class HomeScreen extends StatelessWidget {
                                           Align(
                                             alignment: Alignment.bottomRight,
                                             child: Image.network(
-                                              'https://img.freepik.com/free-vector/cute-woman-men-holding-cardboard-money-ready-deliver-character-cartoon-art-illustration_56104-779.jpg?w=996&t=st=1703407355~exp=1703407955~hmac=8885f125473fe6033ae0b7122376a5b69e4ae08474e08c91a6b046c13b172401',
+                                              'https://images.deliveryhero.io/image/foodpanda/corporate/landing_page/illustration_allowancepaupau.png',
                                               height: 100,
                                               fit: BoxFit.contain,
                                             ),
@@ -215,20 +241,41 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            /// Recommend Food
+            /// Mark : Section Recommended For You
             Padding(
-              padding: EdgeInsets.only(top: 20,left: 20),
+              padding: EdgeInsets.only(top: 20, left: 20),
               child: Container(
-                alignment: Alignment.topLeft,
-                  child:
-                  Text('Recommended For You', style: subTitle)),
+                  alignment: Alignment.topLeft,
+                  child: Text('Recommended For You', style: subTitle)),
             ),
             SizedBox(
               height: 350,
-              child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5,
-                  itemBuilder: (context, index) => ResturantCard()),
+              child: ChangeNotifierProvider(
+                create: (context) => _restaurantViewModel,
+                child: Consumer<RestaurantViewModel>(
+                  builder: (context, viewModel, _) {
+                    switch (viewModel.response.status!) {
+                      case Status.LOADING:
+                        return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 5,
+                            itemBuilder: (context, index) =>
+                                RestaurantSkeleton());
+                      case Status.COMPLETE:
+                        return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 10,
+                            itemBuilder: (context, index) {
+                              var restaurant = viewModel.response.data!.data![index];
+                              return ResturantCard(restaurant: restaurant);
+                            }
+                        );
+                      case Status.ERROR:
+                        return Text("Error");
+                    }
+                  },
+                ),
+              ),
             )
           ],
         ),
